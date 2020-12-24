@@ -2,10 +2,12 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -66,6 +68,28 @@ func AddHeaderFunc(name string, getValue func(*http.Request) (string, error)) Cl
 			if value != "" {
 				req.Header.Add(name, value)
 			}
+			return tr.RoundTrip(req)
+		}}
+	}
+}
+
+// WithUnixDomainSocketProxy directs a RoundTripper through a unix domain socket proxy
+// if socket is set
+func WithUnixDomainSocketProxy(socket string) ClientOption {
+	return func(rt http.RoundTripper) http.RoundTripper {
+		if socket == "" {
+			return rt
+		}
+
+		tr := rt.(*http.Transport).Clone()
+		tr.DialContext = func(ctx context.Context, _, _ string) (net.Conn, error) {
+			dialer := net.Dialer{}
+			return dialer.DialContext(ctx, "unix", socket)
+		}
+
+		return &funcTripper{roundTrip: func(req *http.Request) (*http.Response, error) {
+			// The socket handles authentication transparently.
+			req.URL.Scheme = "http"
 			return tr.RoundTrip(req)
 		}}
 	}
