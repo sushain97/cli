@@ -15,6 +15,13 @@ import (
 // generic authenticated HTTP client for commands
 func NewHTTPClient(io *iostreams.IOStreams, cfg config.Config, appVersion string, setAccept bool) *http.Client {
 	var opts []api.ClientOption
+
+	// Needs to go first since it actually manipulates the transport.
+	unixSocketProxy, err := cfg.Get("", "unix_socket_proxy")
+	if err == nil {
+		opts = append(opts, api.WithUnixDomainSocketProxy(unixSocketProxy))
+	}
+
 	if verbose := os.Getenv("DEBUG"); verbose != "" {
 		logTraffic := strings.Contains(verbose, "api")
 		opts = append(opts, api.VerboseLog(io.ErrOut, logTraffic, io.IsStderrTTY()))

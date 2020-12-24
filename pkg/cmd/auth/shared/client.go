@@ -34,6 +34,13 @@ var ClientFromCfg = func(hostname string, cfg config.Config) (*api.Client, error
 		return nil, fmt.Errorf("no token found in config for %s", hostname)
 	}
 
+	// Needs to go first since it actually manipulates the transport.
+	unixSocketProxy, err := cfg.Get("", "unix_socket_proxy")
+	if err != nil {
+		return nil, err
+	}
+	opts = append(opts, api.WithUnixDomainSocketProxy(unixSocketProxy))
+
 	opts = append(opts,
 		// no access to Version so the user agent is more generic here.
 		api.AddHeader("User-Agent", "GitHub CLI"),
