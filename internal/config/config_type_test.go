@@ -41,6 +41,8 @@ func Test_defaultConfig(t *testing.T) {
 	expected := heredoc.Doc(`
 		# What protocol to use when performing git operations. Supported values: ssh, https
 		git_protocol: https
+		# What unix domain socket to proxy network connections through. This is a global config that cannot be overridden by hostname.
+		unix_socket_proxy:
 		# What editor gh should run when creating issues, pull requests, etc. If blank, will refer to environment.
 		editor:
 		# When to interactively prompt. This is a global config that cannot be overridden by hostname. Supported values: enabled, disabled
