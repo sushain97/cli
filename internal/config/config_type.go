@@ -26,6 +26,11 @@ var configOptions = []ConfigOption{
 		AllowedValues: []string{"https", "ssh"},
 	},
 	{
+		Key:          "unix_socket_proxy",
+		Description:  "the Unix domain socket to route network connections",
+		DefaultValue: "",
+	},
+	{
 		Key:          "editor",
 		Description:  "the text editor program to use for authoring text",
 		DefaultValue: "",
@@ -233,6 +238,15 @@ func NewBlankRoot() *yaml.Node {
 					{
 						Kind:  yaml.ScalarNode,
 						Value: "https",
+					},
+					{
+						HeadComment: "What unix domain socket to proxy network connections through. This is a global config that cannot be overridden by hostname.",
+						Kind:        yaml.ScalarNode,
+						Value:       "unix_socket_proxy",
+					},
+					{
+						Kind:  yaml.ScalarNode,
+						Value: "",
 					},
 					{
 						HeadComment: "What editor gh should run when creating issues, pull requests, etc. If blank, will refer to environment.",
